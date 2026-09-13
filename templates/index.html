@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Resume-JD Matcher | GenAI Powered</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        .input-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* PDF UPLOAD */
+
+            .upload-box {
+            display: block;
+            width: 100%;
+            min-height: 145px;
+            border: 2px dashed #667eea;
+            border-radius: 12px;
+            padding: 22px;
+            text-align: center;
+            background: #f7f8ff;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-box:hover {
+            background: #eef0ff;
+            border-color: #764ba2;
+            transform: translateY(-1px);
+        }
+
+        .upload-icon {
+            font-size: 2.2em;
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            color: #444;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        .upload-subtext {
+            color: #888;
+            font-size: 0.85em;
+            margin-top: 6px;
+        }
+
+        .file-name {
+            margin-top: 12px;
+            color: #2e9d50;
+            font-weight: 600;
+            font-size: 0.9em;
+            word-break: break-word;
+        }
+
+        .or-divider {
+            text-align: center;
+            color: #999;
+            margin: 14px 0;
+            font-size: 0.9em;
+        }
+
+        .upload-box:hover {
+            background: #eef0ff;
+            border-color: #764ba2;
+        }
+
+        .upload-box input {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .upload-text {
+            color: #555;
+            font-weight: 600;
+        }
+
+        .upload-subtext {
+            color: #888;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            color: #4caf50;
+            font-weight: 600;
+            display: none;
+        }
+
+        .or-divider {
+            text-align: center;
+            color: #999;
+            margin: 12px 0;
+            font-size: 0.9em;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .analyze-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .clear-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .clear-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+
+        }
+
+        .results {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .results h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .metric {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .metric-label {
+            flex: 1;
+            font-weight: 600;
+            color: #555;
+            margin-right: 20px;
+        }
+
+        .match-percentage {
+            font-size: 2em;
+            font-weight: bold;
+            min-width: 100px;
+        }
+
+        .percentage-good {
+            color: #4caf50;
+        }
+
+        .percentage-medium {
+            color: #ff9800;
+        }
+
+        .percentage-low {
+            color: #f44336;
+        }
+
+        .verdict {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .verdict-strong {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .verdict-good {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .verdict-moderate {
+            background: #ffe0b2;
+            color: #e65100;
+        }
+
+        .verdict-poor {
+            background: #ffcdd2;
+            color: #c62828;
+        }
+
+        .analysis-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+        }
+
+        .analysis-section h3 {
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .list-item {
+            margin-left: 20px;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .list-item:before {
+            content: "✓ ";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .gap-item {
+            margin-left: 20px;
+            margin-bottom: 8px;
+            color: #d32f2f;
+        }
+
+        .gap-item:before {
+            content: "✗ ";
+            color: #d32f2f;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .improvement-item {
+            margin-left: 20px;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .improvement-item:before {
+            content: "→ ";
+            color: #ff9800;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .error {
+            background: #ffcdd2;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <header>
+
+        <h1>🚀 Smart Resume-JD Matcher</h1>
+
+        <p>
+            AI-Powered Resume Analysis using Google Generative AI
+        </p>
+
+        <div class="badge">
+            Powered by Google Gemini
+        </div>
+
+    </header>
+
+
+    <div class="error" id="error"></div>
+
+
+    <div class="content">
+
+        <!-- ========================= -->
+        <!-- RESUME SECTION -->
+        <!-- ========================= -->
+
+        <div class="input-section">
+
+            <h2>📄 Your Resume</h2>
+
+
+            <!-- PDF UPLOAD -->
+
+            <label class="upload-box" for="resumeFile">
+
+                <div class="upload-icon">
+                    📎
+                </div>
+
+                <div class="upload-text">
+                    Click to Upload Resume PDF
+                </div>
+
+                <div class="upload-subtext">
+                    Maximum file size: 5 MB
+                </div>
+
+                <input
+                    type="file"
+                    id="resumeFile"
+                    accept=".pdf,application/pdf"
+                    onchange="handleFileUpload()"
+                >
+
+                <div
+                    class="file-name"
+                    id="fileName">
+                </div>
+
+            </label>
+
+
+            <div class="or-divider">
+                — OR paste your resume below —
+            </div>
+
+
+            <!-- MANUAL RESUME INPUT -->
+
+            <textarea
+                id="resume"
+                placeholder="Paste your resume text here..."
+            ></textarea>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- JOB DESCRIPTION -->
+        <!-- ========================= -->
+
+        <div class="input-section">
+
+            <h2>💼 Job Description</h2>
+
+            <textarea
+                id="jd"
+                placeholder="Paste the job description here..."
+            ></textarea>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- BUTTONS -->
+    <!-- ========================= -->
+
+    <div class="input-section">
+
+        <div class="button-group">
+
+            <button
+                class="analyze-btn"
+                id="analyzeBtn"
+                onclick="analyzeResume()"
+            >
+                ✨ Analyze Match
+            </button>
+
+            <button
+                class="clear-btn"
+                onclick="clearAll()"
+            >
+                Clear All
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- LOADING -->
+    <!-- ========================= -->
+
+    <div
+        class="loading"
+        id="loading"
+    >
+
+        <div class="spinner"></div>
+
+        <p>
+            🤖 AI is analyzing your resume...
+        </p>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- RESULTS -->
+    <!-- ========================= -->
+
+    <div
+        class="results"
+        id="results"
+    >
+
+        <h2>
+            📊 Analysis Results
+        </h2>
+
+
+        <div class="metric">
+
+            <span class="metric-label">
+                Match Score:
+            </span>
+
+            <span
+                class="match-percentage"
+                id="matchPercentage"
+            >
+                0%
+            </span>
+
+        </div>
+
+
+        <div class="metric">
+
+            <span class="metric-label">
+                Overall Verdict:
+            </span>
+
+            <span
+                class="verdict"
+                id="verdict"
+            >
+                Analyzing...
+            </span>
+
+        </div>
+
+
+        <div class="analysis-section">
+
+            <h3>
+                💡 Key Message
+            </h3>
+
+            <p
+                id="keyMessage"
+                style="color:#333;font-size:1.05em;"
+            ></p>
+
+        </div>
+
+
+        <div class="analysis-section">
+
+            <h3>
+                ✅ Matching Skills
+            </h3>
+
+            <div id="matchingSkills"></div>
+
+        </div>
+
+
+        <div class="analysis-section">
+
+            <h3>
+                🎯 Your Strengths
+            </h3>
+
+            <div id="strengths"></div>
+
+        </div>
+
+
+        <div class="analysis-section">
+
+            <h3>
+                ⚠️ Missing Skills
+            </h3>
+
+            <div id="missingSkills"></div>
+
+        </div>
+
+
+        <div class="analysis-section">
+
+            <h3>
+                📈 Areas to Improve
+            </h3>
+
+            <div id="gaps"></div>
+
+        </div>
+
+
+        <div class="analysis-section">
+
+            <h3>
+                🚀 Actionable Recommendations
+            </h3>
+
+            <div id="improvements"></div>
+
+        </div>
+
+
+        <div class="analysis-section">
+
+            <h3>
+                Technical Fit
+            </h3>
+
+            <p
+                id="technicalFit"
+                style="color:#555;"
+            ></p>
+
+        </div>
+
+
+        <div class="analysis-section">
+
+            <h3>
+                Soft Skills Fit
+            </h3>
+
+            <p
+                id="softSkillsFit"
+                style="color:#555;"
+            ></p>
+
+        </div>
+
+    </div>
+
+
+    <footer>
+
+        <p>
+            🔐 Your data is processed securely |
+            Made with ❤️ for job seekers
+        </p>
+
+    </footer>
+
+</div>
+
+
+<script>
+
+
+// ==========================================
+// FILE UPLOAD HANDLER
+// ==========================================
+
+function handleFileUpload() {
+
+    const fileInput =
+        document.getElementById("resumeFile");
+
+    const fileName =
+        document.getElementById("fileName");
+
+    const resumeTextarea =
+        document.getElementById("resume");
+
+
+    if (!fileInput.files.length) {
+
+        fileName.style.display = "none";
+
+        return;
+
+    }
+
+
+    const file = fileInput.files[0];
+
+
+    // Validate PDF
+
+    if (
+        file.type !== "application/pdf" &&
+        !file.name.toLowerCase().endsWith(".pdf")
+    ) {
+
+        showError("Please upload a PDF file.");
+
+        fileInput.value = "";
+
+        fileName.style.display = "none";
+
+        return;
+
+    }
+
+
+    // Validate file size
+
+    if (file.size > 5 * 1024 * 1024) {
+
+        showError("PDF size must be less than 5 MB.");
+
+        fileInput.value = "";
+
+        fileName.style.display = "none";
+
+        return;
+
+    }
+
+
+    // Show selected filename
+
+    fileName.textContent =
+        "✓ Selected: " + file.name;
+
+    fileName.style.display = "block";
+
+
+    // Clear pasted resume because PDF will be used
+
+    resumeTextarea.value = "";
+
+    document
+        .getElementById("error")
+        .classList.remove("active");
+
+}
+
+
+
+// ==========================================
+// ANALYZE RESUME
+// ==========================================
+
+async function analyzeResume() {
+
+
+    const resume =
+        document.getElementById("resume").value.trim();
+
+    const jd =
+        document.getElementById("jd").value.trim();
+
+    const fileInput =
+        document.getElementById("resumeFile");
+
+    const analyzeBtn =
+        document.getElementById("analyzeBtn");
+
+    const errorDiv =
+        document.getElementById("error");
+
+    const loading =
+        document.getElementById("loading");
+
+    const results =
+        document.getElementById("results");
+
+
+    // Reset error
+
+    errorDiv.classList.remove("active");
+
+    errorDiv.textContent = "";
+
+
+    // ==========================================
+    // VALIDATE RESUME
+    // ==========================================
+
+    if (!resume && !fileInput.files.length) {
+
+        showError(
+            "Please upload a resume PDF or paste your resume."
+        );
+
+        return;
+
+    }
+
+
+    // ==========================================
+    // VALIDATE JD
+    // ==========================================
+
+    if (!jd) {
+
+        showError(
+            "Please paste the job description."
+        );
+
+        return;
+
+    }
+
+
+    // ==========================================
+    // LOADING
+    // ==========================================
+
+    analyzeBtn.disabled = true;
+
+    loading.classList.add("active");
+
+    results.classList.remove("active");
+
+
+    try {
+
+
+        let response;
+
+
+        // ======================================
+        // PDF REQUEST
+        // ======================================
+
+        if (fileInput.files.length) {
+
+
+            const formData =
+                new FormData();
+
+
+            formData.append(
+                "resume_file",
+                fileInput.files[0]
+            );
+
+
+            formData.append(
+                "jd",
+                jd
+            );
+
+
+            response =
+                await fetch(
+                    "/analyze",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+        }
+
+
+        // ======================================
+        // TEXT REQUEST
+        // ======================================
+
+        else {
+
+
+            response =
+                await fetch(
+                    "/analyze",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                resume: resume,
+                                jd: jd
+                            })
+                    }
+                );
+
+        }
+
+
+        // ======================================
+        // RESPONSE
+        // ======================================
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            showError(
+                data.error ||
+                "Analysis failed. Please try again."
+            );
+
+            return;
+
+        }
+
+
+        // Display results
+
+        displayResults(
+            data.data
+        );
+
+        results.classList.add(
+            "active"
+        );
+
+
+        // Scroll to results
+
+        setTimeout(() => {
+
+            results.scrollIntoView({
+                behavior: "smooth"
+            });
+
+        }, 100);
+
+
+    }
+
+
+    catch (error) {
+
+        showError(
+            "Network error: " +
+            error.message
+        );
+
+    }
+
+
+    finally {
+
+        analyzeBtn.disabled = false;
+
+        loading.classList.remove(
+            "active"
+        );
+
+    }
+
+}
+
+
+
+// ==========================================
+// DISPLAY RESULTS
+// ==========================================
+
+function displayResults(analysis) {
+
+
+    const percentage =
+        analysis.match_percentage || 0;
+
+
+    const verdict =
+        analysis.overall_verdict ||
+        "Unknown";
+
+
+    // ==========================================
+    // MATCH PERCENTAGE
+    // ==========================================
+
+    const percentageEl =
+        document.getElementById(
+            "matchPercentage"
+        );
+
+
+    percentageEl.textContent =
+        percentage + "%";
+
+
+    percentageEl.className =
+        "match-percentage";
+
+
+    if (percentage >= 70) {
+
+        percentageEl.classList.add(
+            "percentage-good"
+        );
+
+    }
+
+    else if (percentage >= 50) {
+
+        percentageEl.classList.add(
+            "percentage-medium"
+        );
+
+    }
+
+    else {
+
+        percentageEl.classList.add(
+            "percentage-low"
+        );
+
+    }
+
+
+    // ==========================================
+    // VERDICT
+    // ==========================================
+
+    const verdictEl =
+        document.getElementById(
+            "verdict"
+        );
+
+
+    verdictEl.textContent =
+        verdict;
+
+
+    verdictEl.className =
+        "verdict";
+
+
+    if (verdict.includes("Strong")) {
+
+        verdictEl.classList.add(
+            "verdict-strong"
+        );
+
+    }
+
+    else if (verdict.includes("Good")) {
+
+        verdictEl.classList.add(
+            "verdict-good"
+        );
+
+    }
+
+    else if (verdict.includes("Moderate")) {
+
+        verdictEl.classList.add(
+            "verdict-moderate"
+        );
+
+    }
+
+    else {
+
+        verdictEl.classList.add(
+            "verdict-poor"
+        );
+
+    }
+
+
+    // ==========================================
+    // KEY MESSAGE
+    // ==========================================
+
+    document.getElementById(
+        "keyMessage"
+    ).textContent =
+        analysis.key_message || "";
+
+
+    // ==========================================
+    // MATCHING SKILLS
+    // ==========================================
+
+    document.getElementById(
+        "matchingSkills"
+    ).innerHTML =
+
+        (analysis.matching_skills || [])
+
+        .map(
+            skill =>
+                `<div class="list-item">${escapeHtml(skill)}</div>`
+        )
+
+        .join("");
+
+
+    // ==========================================
+    // STRENGTHS
+    // ==========================================
+
+    document.getElementById(
+        "strengths"
+    ).innerHTML =
+
+        (analysis.strengths || [])
+
+        .map(
+            strength =>
+                `<div class="list-item">${escapeHtml(strength)}</div>`
+        )
+
+        .join("");
+
+
+    // ==========================================
+    // MISSING SKILLS
+    // ==========================================
+
+    document.getElementById(
+        "missingSkills"
+    ).innerHTML =
+
+        (analysis.missing_skills || [])
+
+        .map(
+            skill =>
+                `<div class="gap-item">${escapeHtml(skill)}</div>`
+        )
+
+        .join("");
+
+
+    // ==========================================
+    // GAPS
+    // ==========================================
+
+    document.getElementById(
+        "gaps"
+    ).innerHTML =
+
+        (analysis.gaps || [])
+
+        .map(
+            gap =>
+                `<div class="gap-item">${escapeHtml(gap)}</div>`
+        )
+
+        .join("");
+
+
+    // ==========================================
+    // IMPROVEMENTS
+    // ==========================================
+
+    document.getElementById(
+        "improvements"
+    ).innerHTML =
+
+        (analysis.improvements || [])
+
+        .map(
+            improvement =>
+                `<div class="improvement-item">${escapeHtml(improvement)}</div>`
+        )
+
+        .join("");
+
+
+    // ==========================================
+    // TECHNICAL FIT
+    // ==========================================
+
+    document.getElementById(
+        "technicalFit"
+    ).textContent =
+        analysis.technical_fit || "";
+
+
+    // ==========================================
+    // SOFT SKILLS FIT
+    // ==========================================
+
+    document.getElementById(
+        "softSkillsFit"
+    ).textContent =
+        analysis.soft_skills_fit || "";
+
+}
+
+
+
+// ==========================================
+// HTML ESCAPE
+// ==========================================
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        text;
+
+    return div.innerHTML;
+
+}
+
+
+
+// ==========================================
+// SHOW ERROR
+// ==========================================
+
+function showError(message) {
+
+    const errorDiv =
+        document.getElementById(
+            "error"
+        );
+
+    errorDiv.textContent =
+        message;
+
+    errorDiv.classList.add(
+        "active"
+    );
+
+}
+
+
+
+// ==========================================
+// CLEAR ALL
+// ==========================================
+
+function clearAll() {
+
+
+    document.getElementById(
+        "resume"
+    ).value = "";
+
+
+    document.getElementById(
+        "jd"
+    ).value = "";
+
+
+    document.getElementById(
+        "resumeFile"
+    ).value = "";
+
+
+    document.getElementById(
+        "fileName"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "results"
+    ).classList.remove(
+        "active"
+    );
+
+
+    document.getElementById(
+        "error"
+    ).classList.remove(
+        "active"
+    );
+
+
+    document.getElementById(
+        "resume"
+    ).focus();
+
+}
+
+
+</script>
+
+</body>
+
+</html>
